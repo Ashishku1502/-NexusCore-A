@@ -23,14 +23,33 @@ import { AgentType, AgentStatus, SocketEvents } from "../shared/types.js";
 export const app = express();
 const httpServer = createServer(app);
 
+// Support multiple allowed origins (local dev + Netlify production)
+const allowedOrigins = [
+  "http://localhost:5173",
+  process.env.CLIENT_URL,
+].filter(Boolean);
+
 const io = new Server(httpServer, {
   cors: {
-    origin: process.env.CLIENT_URL || "http://localhost:5173",
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like REST clients / curl)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) return callback(null, true);
+      callback(new Error(`CORS blocked: ${origin}`));
+    },
     methods: ["GET", "POST"],
+    credentials: true,
   },
 });
 
-app.use(cors());
+app.use(cors({
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    callback(new Error(`CORS blocked: ${origin}`));
+  },
+  credentials: true,
+}));
 app.use(express.json());
 
 // ── Init Memory ───────────────────────────────────────────
@@ -248,16 +267,14 @@ app.post("/api/run", async (req, res) => {
 // ── Start ──────────────────────────────────────────────────
 const PORT = process.env.PORT || 3001;
 
-// Only listen if this is the main module (not for Vercel functions)
-if (process.env.NODE_ENV !== "production") {
-  httpServer.listen(PORT, () => {
-    console.log(`
+// Always start the HTTP server (Railway, Render, local dev)
+httpServer.listen(PORT, () => {
+  console.log(`
   ╔═══════════════════════════════════════════╗
   ║     NexusCore — Multi-Agent Runtime       ║
   ║     http://localhost:${PORT}                  ║
   ╚═══════════════════════════════════════════╝
-    `);
-  });
-}
+  `);
+});
 
 export default app;
