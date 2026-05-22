@@ -6,8 +6,13 @@ import { useState, useEffect, useCallback } from "react";
 import { io } from "socket.io-client";
 import { SocketEvents } from "../../../shared/types.js";
 
-const isLocal = typeof window !== "undefined" && window.location.hostname === "localhost";
-const SERVER_URL = import.meta.env.VITE_SERVER_URL || (isLocal ? "http://localhost:3001" : (typeof window !== "undefined" ? window.location.origin : "http://localhost:3001"));
+// In production (Netlify), VITE_SERVER_URL is set to your Railway backend URL.
+// Locally, it falls back to http://localhost:3001
+const SERVER_URL =
+  import.meta.env.VITE_SERVER_URL ||
+  (typeof window !== "undefined" && window.location.hostname !== "localhost"
+    ? "" // should always be set via VITE_SERVER_URL in production
+    : "http://localhost:3001");
 
 export function useSocket() {
   const [socket, setSocket] = useState(null);

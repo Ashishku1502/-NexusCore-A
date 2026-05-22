@@ -33,7 +33,7 @@ export async function routeToAgent(task, { sessionId, dag, isAborted }) {
       operation: "compress", 
       data: context 
     }, { onLog: (log) => {
-      if (isAborted && !isAborted()) emitLog(sessionId, log);
+      if (!isAborted || !isAborted()) emitLog(sessionId, log);
     } });
     context = { _compressed: true, summary: compressed };
   }
@@ -48,7 +48,7 @@ export async function routeToAgent(task, { sessionId, dag, isAborted }) {
   });
 
   const onLog = (log) => {
-    if (isAborted && !isAborted()) emitLog(sessionId, log);
+    if (!isAborted || !isAborted()) emitLog(sessionId, log);
   };
   
   try {

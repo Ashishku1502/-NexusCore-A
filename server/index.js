@@ -24,9 +24,12 @@ export const app = express();
 const httpServer = createServer(app);
 
 // Support multiple allowed origins (local dev + Netlify production)
+// CLIENT_URL can be a comma-separated list, e.g.:
+//   CLIENT_URL=https://nexuscore.netlify.app,http://localhost:5173
 const allowedOrigins = [
   "http://localhost:5173",
-  process.env.CLIENT_URL,
+  "http://localhost:3000",
+  ...(process.env.CLIENT_URL ? process.env.CLIENT_URL.split(",").map(u => u.trim()) : []),
 ].filter(Boolean);
 
 const io = new Server(httpServer, {

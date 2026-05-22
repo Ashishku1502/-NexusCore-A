@@ -20,7 +20,7 @@ export function LiveLogsStream({ logs }) {
       <div style={styles.stream}>
         {logs.map((log, i) => (
           <div key={i} style={styles.logLine}>
-            <span style={styles.timestamp}>[{new Date(log.timestamp).toLocaleTimeString()}]</span>
+            <span style={styles.timestamp}>[{log.timestamp ? new Date(log.timestamp).toLocaleTimeString() : new Date().toLocaleTimeString()}]</span>
             <span style={styles.agent(log.agent)}>{log.agent?.toUpperCase() || "SYS"}</span>
             <span style={styles.message(log.level)}>{log.message}</span>
           </div>

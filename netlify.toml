@@ -13,7 +13,19 @@
   NPM_FLAGS = "--include=dev"
   CI = "false"
 
-# SPA fallback — serve index.html for all routes
+# ─────────────────────────────────────────────
+#  Headers — Security + CORS for Socket.io
+# ─────────────────────────────────────────────
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+# ─────────────────────────────────────────────
+#  SPA Fallback — serve index.html for all routes
+# ─────────────────────────────────────────────
 [[redirects]]
   from = "/*"
   to = "/index.html"

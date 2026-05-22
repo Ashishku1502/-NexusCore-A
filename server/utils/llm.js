@@ -15,7 +15,7 @@ export async function callLLM({ system, messages, maxTokens = 1000, temperature 
 
   try {
     const response = await anthropic.messages.create({
-      model: "claude-3-sonnet-20240229",
+      model: "claude-3-5-sonnet-20241022",
       max_tokens: maxTokens,
       temperature: temperature,
       system: system,

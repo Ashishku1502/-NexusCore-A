@@ -49,13 +49,73 @@ npm run dev    # starts server (3001) + client (5173) concurrently
 
 ## 🔑 Environment Variables
 
-| Variable | Required | Description |
-|---|---|---|
-| `ANTHROPIC_API_KEY` | ✅ | Claude API key |
-| `PINECONE_API_KEY` | ⚪ | Vector memory (mock if absent) |
-| `PINECONE_INDEX_NAME` | ⚪ | Index name (default: nexuscore-memory) |
-| `PORT` | ⚪ | Server port (default: 3001) |
-| `CLIENT_URL` | ⚪ | CORS origin (default: localhost:5173) |
+| Variable | Required | Where | Description |
+|---|---|---|---|
+| `ANTHROPIC_API_KEY` | ✅ | Railway | Claude API key |
+| `PINECONE_API_KEY` | ⚪ | Railway | Vector memory (mock if absent) |
+| `PINECONE_INDEX_NAME` | ⚪ | Railway | Index name (default: nexuscore-memory) |
+| `PORT` | ⚪ | Railway | Server port (Railway sets automatically) |
+| `CLIENT_URL` | ✅ (prod) | Railway | Your Netlify frontend URL (CORS whitelist) |
+| `VITE_SERVER_URL` | ✅ (prod) | Netlify | Your Railway backend URL |
+| `MOCK_MODE` | ⚪ | Railway | `true` for demo without API key |
+
+---
+
+## 🚀 Deploy to Netlify + Railway
+
+NexusCore uses a split architecture:
+- **Frontend** (React/Vite) → **Netlify** (static hosting + CDN)
+- **Backend** (Express + Socket.io) → **Railway** (persistent Node.js server)
+
+> Socket.io requires persistent WebSocket connections — Netlify Functions cannot support this, so the backend runs on Railway.
+
+### Step 1 — Deploy Backend to Railway
+
+1. Go to [railway.app](https://railway.app) → **New Project** → **Deploy from GitHub repo**
+2. Select your NexusCore repository
+3. Railway auto-detects `railway.json` and starts `node server/index.js`
+4. Go to **Variables** tab and add:
+   ```
+   ANTHROPIC_API_KEY=sk-ant-...
+   CLIENT_URL=https://your-app.netlify.app
+   MOCK_MODE=false
+   ```
+5. Go to **Settings → Networking** → **Generate Domain**  
+   Copy your Railway URL: `https://nexuscore-xxx.up.railway.app`
+
+### Step 2 — Deploy Frontend to Netlify
+
+1. Go to [netlify.com](https://netlify.com) → **Add new site** → **Import from Git**
+2. Select your NexusCore repository
+3. Netlify auto-detects `netlify.toml` (build command + publish dir are pre-configured)
+4. Go to **Site configuration → Environment variables** and add:
+   ```
+   VITE_SERVER_URL=https://nexuscore-xxx.up.railway.app
+   ```
+5. Click **Deploy site**
+
+### Step 3 — Update CORS on Railway
+
+Once you have your Netlify URL (e.g. `https://nexuscore-ai.netlify.app`):
+
+1. Go to Railway → your project → **Variables**
+2. Update: `CLIENT_URL=https://nexuscore-ai.netlify.app`
+3. Railway auto-redeploys
+
+### Architecture in Production
+
+```
+Browser (Netlify CDN)
+    │
+    │  Socket.io WebSocket + REST
+    ▼
+Railway (Express + Socket.io server)
+    │
+    └── Anthropic Claude API
+    └── Pinecone (optional)
+```
+
+
 
 ## 🧩 Architecture
 
