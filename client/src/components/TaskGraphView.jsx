@@ -1,5 +1,5 @@
 import React from "react";
-import { TaskStatus } from "../../../shared/types.js";
+import { TaskStatus } from "../types.js";
 
 export function TaskGraphView({ dagGraph }) {
   const { nodes, edges } = dagGraph;

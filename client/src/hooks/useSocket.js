@@ -4,7 +4,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { io } from "socket.io-client";
-import { SocketEvents } from "../../../shared/types.js";
+import { SocketEvents } from "../types.js";
 
 // In production (Netlify), VITE_SERVER_URL is set to your Railway backend URL.
 // Locally, it falls back to http://localhost:3001

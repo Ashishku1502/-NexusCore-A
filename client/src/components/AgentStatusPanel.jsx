@@ -1,5 +1,5 @@
 import React from "react";
-import { AgentType } from "../../../shared/types.js";
+import { AgentType } from "../types.js";
 
 export function AgentStatusPanel({ agentStatuses }) {
   const agents = Object.values(AgentType);
